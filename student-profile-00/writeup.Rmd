@@ -1,28 +1,19 @@
----
-title: "writeup"
-output: html_document
----
+Profile for Anubha Nagar
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+Hometown: 
 
-## R Markdown
+Anubha is from India, where she also did her undergraduate degree in Electronics and Communication Engineering. Engineering gave her a background in statistics, calculus, statistics and python. 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Journey to DS: 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Anubha realized she wanted to pursue Data Science in her undergraduate degree. She took up multiple courses related to Data Science, did internships and realized Data Science was her passion. She wants to be able to use Data Science to revolutionize quotidian operations and create impactful projects.  
 
-```{r cars}
-summary(cars)
-```
 
-## Including Plots
+Hobbies:
+Anubha loves playing sports like tennis, table tennis and badminton. She loves painting and likes watching movies and tv shows in her free time. Anubha also loves baking and has baked cheesecakes and mouse cakes during her free time. 
+ 
+Food:
+Anubha loves eating pizza, sushi, that food and loves exploring other food options. Her go-to food is pizza and Indian food. She has a great spice tolerance and loves spicy food.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Favorite book/movie/artist:
+Her favorite author is Agatha Cristie and her favorite book is Murder on the orient express. She loves watching thriller and suspenseful movies/shows like "Designated Survivor" or "Outer Banks".
