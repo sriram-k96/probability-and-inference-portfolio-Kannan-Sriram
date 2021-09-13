@@ -1,0 +1,155 @@
+---
+title: "Monte Carlo Error"
+author: ' Sriram Kannan'
+date: "`r format(Sys.time(), '%09-%13-%2021')`"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  html_document:
+    code_folding: hide
+    toc: yes
+    number_sections: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+# Introduction 
+
+Simulation by essence, operates through approximation, that is, there is some degree of error in a quantity estimated by the Monte Carlo simulation. Intuitively, it would seem that the degree of error is inversely proportional to the number of times a simulation is repeated. In this blog post, we attempt to investigate the relationship between then number of replicates and simulation error - Both Absolute and Relative Error.
+
+# Background
+
+Monte Carlo simulation is a technique used to predict the probability of different outcomes when factors causing uncertainty are present. It is used across a wide range of fields such as finance, manufacturing, research and development, insurance, logistics etc in order to bolster the decision making process. It equips the user with a range of possible outcomes and probabilities of any choice of action.
+
+This technique was first used by scientists working on the Manhattan Project during World War 2 and gains its moniker from  Monte Carlo, the Monaco resort town famous for its casinos. 
+
+The Monte Carlo simulation is then run across an uncertain variable which is assigned a random value and outputs a result. This process is repeated again and again while assigning the variable in question with many different values. Once the simulation is complete, the results are averaged together to provide an estimate. It focuses on constantly repeating random samples to achieve certain results.
+
+# Methods and Observations
+
+In order to illustrate the relationship between the number of replicates and the simulation error, we perform a 14 X 5 factorial experiment simulation that estimates the error for each combination of replicate number (4, 8, 16, 32 and so on) and probabilities (0.01, 0.05, 0.10, 0.25, 0.50). 
+
+P denotes the true underlying probability
+pcap denotes the probability estimated from the simulation
+
+absolute error = |pcap - p|
+
+and
+
+relative error = |pcap - p|/
+
+Our number of trials in an experiment (r) is fixed at 10000. 
+
+
+```{r}
+#Required library for the plots
+library(tgsify)
+```
+
+```{r}
+#We initialize a grid with all possible combinations of number of replicates (N which is a sequence of incremental exponents of 2) and true probabilities (P) we wish to test against. The error variables are initialized here with NULL values that are to be filled using the below code. 
+op <- expand.grid(
+  N = 2^c(2:15),
+  P = c(0.01, 0.05, 0.10, 0.25, 0.50),
+  absolute_error = NA,
+  relative_error = NA,
+  KEEP.OUT.ATTRS = FALSE
+)
+```
+
+```{r}
+#We calculate the pcap value as well as the errors for the grid above using the below chunk of code.
+r <- 10000
+for(i in 1:nrow(op))
+{
+  p <- op$P[i]
+  n <- op$N[i]
+  pcap <- rbinom(r,n,p)/n 
+  op[i, "absolute_error"] <- mean(abs(pcap - p))
+  op[i, "relative_error"] <- mean(abs(pcap - p)/p)
+}
+```
+
+
+
+```{r}
+op
+```
+The grid above shows the both error values for all combinations of replicates and probabilities in our experiment. 
+
+```{r}
+op %>% 
+  mutate(x = log2(N)) %>%
+  mutate(col = as.factor(P) %>% as.numeric) %>%
+  #dev.new(width=5, height=4, unit="in") %>%
+  plot_setup(absolute_error ~ x, c(0,15)) %>%
+  split(.$P) %>%
+  lwith({
+    lines(x, absolute_error, col = col[1], lwd = 3, type = "b", pch = 16)
+    text(x[1], absolute_error[1], "p="%|%P[1], pos = 2, col = col[1])
+    title(xlab = "N (log2 scale)", ylab = "Absolute Error")
+  })
+axis(2)
+axis(1, at = axTicks(1), labels = 2^axTicks(1))
+box()
+
+```
+The plot above shows the relationship between absolute errors and the number of replicates. We can see that as the number of replicates increases, the absolute error approaches 0 irrespective of the probability. A second observation is that true probability value is directly proportional to the absolute error - this gets neutered over time as replicates increase. 
+
+
+
+```{r}
+op %>% 
+  mutate(x = log2(N)) %>%
+  mutate(col = as.factor(P) %>% as.numeric) %>%
+  plot_setup(relative_error ~ x, c(0,15)) %>%
+  split(.$P) %>%
+  lwith({
+    lines(x, relative_error, col = col[1], lwd = 5, type = "b", pch = 16)
+    text(x[1], relative_error[1], "p="%|%P[1], pos = 2, col = col[1])
+    title(xlab = "N (log2 Scale)", ylab = "Relative Error")
+  })
+axis(2)
+axis(1, at = axTicks(1), labels = 2^axTicks(1))
+box()
+
+```
+The plot above shows the relationship between relative errors and the number of replicates. We can see that as the number of replicates increases, the relative error also approaches 0 irrespective of the probability. A second observation is that true probability value is inversely proportional to the relative error unlike the absolute error - this also however, gets neutered over time as replicates increase. 
+
+```{r}
+op %>% 
+  mutate(x = log2(N)) %>%
+  mutate(absolute_error = log10(absolute_error)) %>%
+  mutate(col = as.factor(P) %>% as.numeric) %>%
+  plot_setup(absolute_error ~ x, c(0,15)) %>%
+  split(.$P) %>%
+  lwith({
+    lines(x, absolute_error, col = col[1], lwd = 5, type = "b", pch = 16)
+    text(x[1], absolute_error[1], "p="%|%P[1], pos = 2, col = col[1])
+  })
+axis(2, at = axTicks(2), labels = 10^axTicks(2))
+axis(1, at = axTicks(1), labels = 2^axTicks(1))
+title(xlab = "N (log2 scale)", ylab = "Absolute Error (log10 Scale)")
+box()
+
+```
+The plot above shows the relationship between absolute errors and the number of replicates with the absolute error being in the log10 scale. We see a more precise view of the magnitude of the absolute error and notice a gradual decay in errors over time as replicates increase irrespective of probability. True probability value is directly proportional to the absolute error as expected.
+
+```{r}
+op %>% 
+  mutate(x = log2(N)) %>%
+  mutate(relative_error = log10(relative_error)) %>%
+  mutate(col = as.factor(P) %>% as.numeric) %>%
+  plot_setup(relative_error ~ x, c(0,15)) %>%
+  split(.$P) %>%
+  lwith({
+    lines(x, relative_error, col = col[1], lwd = 5, type = "b", pch = 16)
+    text(x[1], relative_error[1], "p="%|%P[1], pos = 2, col = col[1])
+  })
+axis(2, at = axTicks(2), labels = 10^axTicks(2))
+axis(1, at = axTicks(1), labels = 2^axTicks(1))
+title(xlab = "N (log2 scale)", ylab = "Relative Error (log10 Scale)")
+box()
+```
+The plot above shows the relationship between relative errors and the number of replicates with the relative error being in the log10 scale. We see a more precise view of the magnitude of the relative error and notice a gradual decay in errors over time as replicates increase irrespective of probability. True probability value is inversely proportional to the relative error as expected.
