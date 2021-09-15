@@ -3,15 +3,15 @@ title: "Roulette Simulation"
 author: ' Sriram Kannan'
 date: "`r format(Sys.time(), '%09-%05-%2021')`"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
   html_document:
     code_folding: hide
     toc: yes
     number_sections: yes
     toc_depth: 3
     toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
 ---
 # Introduction
 
@@ -54,22 +54,22 @@ Some casinos have a maximum bet. Call this parameter M. If the strategy directs 
 
 
 # Methods
-```{r}
-#The below chunks of code show the modular processes involved in simulation of the roulette game based on the above constraints. one_series() function is a culmination of the entire roulette spin which utilizes all the modular functions.
-```
+
+The below chunks of code show the modular processes involved in simulation of the roulette game based on the above constraints. one_series() function is a culmination of the entire roulette spin which utilizes all the modular functions.
 
 
+This chunk of code simulates a single spin of the roulette
 ```{r}
-#This chunk of code simulates a single spin of the roulette
+#Simulates Single Spin 
 single_spin <- function(){
   possible_outcomes <- c(rep("red",18), rep("black",18), rep("green",2))
   sample(possible_outcomes, 1)
 }
 ```
 
-
+This chunk of code calculates the wager for the upcoming turn based on the previous wager as well as the previous outcome.
 ```{r}
-#This chunk of code calculates the wager for the upcoming turn based on the previous wager as well as the previous outcome.
+#Simulates martingale wager
 martingale_wager <- function(
   previous_wager
   , previous_outcome
@@ -82,8 +82,9 @@ martingale_wager <- function(
 
 ```
 
+This chunk of code simulates one turn of the roulette outputting specific parameters to be used as part of a series of spins
 ```{r}
-#This chunk of code simulates one turn of the roulette outputting specific parameters to be used as part of a series of spins. 
+#Simulates a single play/turn in a roulette game. 
 one_play <- function(previous_ledger_entry, max_wager){
   # Create a copy of the input object that will become the output object
   out <- previous_ledger_entry
@@ -102,8 +103,9 @@ one_play <- function(previous_ledger_entry, max_wager){
 }
 ```
 
+This chunk of code establishes the stopping condition based on factors discussed above
 ```{r}
-#This chunk of code establishes the stopping condition 
+#Stopping Condition 
 stopping_rule <- function(
   ledger_entry
   , winning_threshold
@@ -115,8 +117,9 @@ stopping_rule <- function(
 }
 ```
 
+This chunk of code simulates the entire series of roulette spins until a certain stopping condition is achieved
 ```{r}
-#This chunk of code simulates the entire series of roulette spins until a certain stopping condition is acheived.
+#Simulation of the entire roulette game.
 one_series <- function(
   max_games, starting_budget, winning_threshold, max_wager
 ){
@@ -141,9 +144,9 @@ one_series <- function(
 ```
 
 # Results
-
+The below code chunk gives the profit over a full series of roulette spins which is a property of interest
 ```{r}
-#The below code chunk gives the profit over a full series of roulette spins which is a property of interest. 
+#Profit function given the entire series of plays.. 
 profit <- function(ledger){
   n <- nrow(ledger)
   profit <- ledger[n, "ending_budget"] - ledger[1, "starting_budget"]
@@ -179,15 +182,25 @@ __Lost Wager__
 
 ![](images/Loser(1).PNG)
 
+Here we see an example of a player get half way to his win condition but drops off sharply at his 250th turn. 
+
 
 ![](images/Loser(2).PNG)
+
+Here we see an example of a very swift loss right at turn 14.
+
+Here we see a 
 
 __Won Wager__
 
 ![](images/Winner(1).PNG)
 
+Here is an example of a player almost losing at around turn 30 but managing to use the strategy and reach his win condition at turn 270 or so.
+
 
 ![](images/Winner(2).PNG)
+
+Here is another example of a player almost losing at many points in the game but managing to eek out the win eventually. 
 
 # Conclusion and Discussion
 
@@ -200,23 +213,95 @@ For instance,
 * The number of chances to play is also directly proportional to the chance of a positive outcome. (In our scenario this played a very minor role due to how the stopping conditions were set up.)
 * The maximum bet amount is inversely (although not in any linear fashion) proportional to the chance of a positive outcome.
 
+All of the above listed points are highly situational and only applicable in a specific scenario to successfully execute the Martingale strategy as will be discussed in the conclusion.  
+
+The function below returns the total profits/losses of many replicates of roulette games using different constraints.
 
 ```{r}
-#This chunk of code returns positive results alone
 PResult <- function(r, max_games, starting_budget, winning_threshold, max_wager)
 {
 rep <- c(replicate(r, profit(one_series(max_games, starting_budget, winning_threshold, max_wager))))
-return (rep[rep>0])
+return (rep)
 }
 ```
 
 ```{r}
-#This chunk of code shows how changing parameters based on the discussion above affects the outcome of the series of wagers.
-PResult(15, 1000, 200, 300, 100)
-PResult(15, 1000, 200, 300, 2000)
-PResult(15, 1500, 1000, 2000, 2000)
-PResult(15, 1000, 25000, 30000, 50000)
-
+library(tidyverse)
+library(ggplot2)
 ```
 
-There tends to be a shift towards outcomes being positive. Hence, Martingale's strategy while not a slam dunk in every scenario, can be edged towards a positive outcome based on conditions at play. However, it is still based of probability and not an absolute certainty. Even with conducive conditions, one could get unlucky. This can be observed in the above example in the 3rd case whwere it had large amounts of profits but the number of positive results were lower than the first case.
+This chunk of code shows how changing parameters based on the discussion above affects the outcome of the series of wagers i.e, gives us the distribution of earnings over games as well as average earnings over a series of games.
+```{r}
+#.
+set.seed(1)
+a <- PResult(20, 1000, 200, 300, 100)
+a1 <- as.data.frame(a)
+a1 <- mutate(a1, GameIndex = 1:length(a))
+colnames(a1) <- c("Profit", "GameIndex")
+ggplot(data = a1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
+mean(a1$Profit)
+
+# get_last <- function(x) x[length(x)]
+# 
+# 
+# # Simulation
+# walk_out_money <- rep(NA, 50)
+# for(j in seq_along(walk_out_money)){
+#   walk_out_money[j] <- one_series(starting_budget = 200, winning_threshold = 300, max_games = 1000, max_wager = 100) %>%  get_last
+# }
+# 
+# lapply(walk_out_money, function(x) x[length(x)] - 200)
+# 
+# # Walk out money distribution
+# #hist(as.numeric(walk_out_money), breaks = 100)
+# 
+# d1 <- as.data.frame(lapply(walk_out_money, function(x) x[length(x)] - 200))
+# index(d1, col = 1:length(d1))
+# dim(d1)
+
+
+```
+With these set of parameters, we have a mean earnings of -5. 
+
+```{r}
+set.seed(1)
+b<- PResult(20, 1000, 200, 500, 100)
+b1 <- as.data.frame(b)
+b1 <- mutate(b1, GameIndex = 1:length(b))
+colnames(b1) <- c("Profit", "GameIndex")
+ggplot(data = b1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation", xlab = "Profit", ylab = "Game Index")
+mean(b1$Profit)
+
+```
+With these set of parameters, the mean earnings is -81.2. We had increased the winning threshold which proves to be problematic for the most part as the player would have to risk more to reach the higher winning threshold(to attain stopping condition) while having only 200$ to play around with. 
+
+```{r}
+set.seed(1)
+c <- PResult(20, 1000, 1000, 2000, 200)
+c1 <- as.data.frame(c)
+c1 <- mutate(c1, GameIndex = 1:length(c))
+colnames(c1) <- c("Profit", "GameIndex")
+ggplot(data = c1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
+mean(c1$Profit)
+```
+With these set of parameters, the mean earnings is -123.35 (We seem to have some sorely unlucky series of games so far!). We had increased the starting threshold and adjusted the winning threshold as well and the results don't seem too promising in this case either. An interesting observation is that the winning threshold is never reached (it would be reached with much higher repetitions but clearly, the probability is low. And the 1000 turn limit was actually used up in case of positive profits.). Perhaps more turns could deliver a full 1000$ profit? Let's explore that below. 
+
+```{r}
+set.seed(1)
+d <- PResult(20, 10000, 1000, 2000, 200)
+d1 <- as.data.frame(d)
+d1 <- mutate(d1, GameIndex = 1:length(d))
+colnames(d1) <- c("Profit", "GameIndex")
+ggplot(data = d1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
+mean(d1$Profit)
+```
+As expected, with a higher number of chances, we are able to reach the full 1000$ profit(1000$ being the difference between the winning_threshold and the starting_budget) but we still end up with a poor mean earnings of -700.
+
+#Conclusion 
+
+Using the above observations, we can clearly see that Martingale's strategy while not a slam dunk in every scenario. This can be extended to state that based on a set of static conditions, Martingale's strategy is not a definite win strategy. It can however be considered a definite win strategy if there are no constraints(i.e, no budget limitations, no betting limitations etc) or if the constraints the dynamic (i.e, the starting budget can be completely controlled by the player as the game progresses - this alone could greatly increase the winning chances if the number of plays or the betting limit is high enough.). The more dynamic constraints, the faster/less number of turns it'll take to gain a positive outcome. Dynamically changing the winning threshold based on previous turns by the player also would guarantee a success provided the dynamic starting budget and reasonably high max number of turns. 
+
+```{r}
+install.packages("htmltools")
+```
+
