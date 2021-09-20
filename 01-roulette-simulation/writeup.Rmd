@@ -235,7 +235,7 @@ This chunk of code shows how changing parameters based on the discussion above a
 In order to make the histogram viewable, it's shown for 20 repetitions but the distribution can be extended upto any number of required repetitions. The means/average earnings shown will be for 1000 repetitions. 
 ```{r}
 #.
-set.seed(1)
+set.seed(3)
 a <- PResult(20, 1000, 200, 300, 100)
 a1 <- as.data.frame(a)
 a1 <- mutate(a1, GameIndex = 1:length(a))
@@ -267,17 +267,15 @@ mean(a2$Profit)
 
 
 ```
-With these set of parameters, we have a mean earnings of -48.316. 
+With these set of parameters, we have a mean earnings of -49.735. 
 
 ```{r}
-set.seed(1)
+set.seed(3)
 b<- PResult(20, 1000, 200, 500, 100)
 b1 <- as.data.frame(b)
 b1 <- mutate(b1, GameIndex = 1:length(b))
 colnames(b1) <- c("Profit", "GameIndex")
-b2 <- b1 %>% group_by(Profit) %>% count() 
-colnames(b2) <- c("Profit", "Frequency")
-ggplot(data = b2, aes(x = Profit, y = Frequency)) + geom_col(stat = "identity") + labs(title = "Average Earnings Simulation(20 Repetitions)")
+ggplot(data = b1, aes(x = GameIndex, y = Profit)) + geom_col(stat = "identity") + labs(title = "Average Earnings Simulation(20 Repetitions)")
 b2<- PResult(1000, 1000, 200, 500, 100)
 b2 <- as.data.frame(b2)
 b2 <- mutate(b2, GameIndex = 1:length(b2))
@@ -285,10 +283,10 @@ colnames(b2) <- c("Profit", "GameIndex")
 mean(b2$Profit)
 
 ```
-With these set of parameters, the mean earnings is -96.324. We had increased the winning threshold which proves to be problematic for the most part as the player would have to risk more to reach the higher winning threshold(to attain stopping condition) while having only 200$ to play around with. 
+With these set of parameters, the mean earnings is -99.031. We had increased the winning threshold which proves to be problematic for the most part as the player would have to risk more to reach the higher winning threshold(to attain stopping condition) while having only 200$ to play around with. 
 
 ```{r}
-set.seed(1)
+set.seed(3)
 c <- PResult(20, 1000, 1000, 2000, 200)
 c1 <- as.data.frame(c)
 c1 <- mutate(c1, GameIndex = 1:length(c))
@@ -300,10 +298,10 @@ c2 <- mutate(c2, GameIndex = 1:length(c2))
 colnames(c2) <- c("Profit", "GameIndex")
 mean(c2$Profit)
 ```
-With these set of parameters, the mean earnings is -97.798 (We seem to have some sorely unlucky series of games so far!). We had increased the starting threshold and adjusted the winning threshold as well and the results don't seem too promising in this case either. An interesting observation is that the winning threshold is never reached (it would be reached with much higher repetitions but clearly, the probability is low. And the 1000 turn limit was actually used up in case of positive profits.). Perhaps more turns could deliver a full 1000$ profit? Let's explore that below. 
+With these set of parameters, the mean earnings is -99.848 (We seem to have some sorely unlucky series of games so far!). We had increased the starting threshold and adjusted the winning threshold as well and the results don't seem too promising in this case either. An interesting observation is that the winning threshold is never reached (it would be reached with much higher repetitions but clearly, the probability is low. And the 1000 turn limit was actually used up in case of positive profits.). Perhaps more turns could deliver a full 1000$ profit? Let's explore that below. 
 
 ```{r}
-set.seed(2)
+set.seed(3)
 d <- PResult(20, 10000, 1000, 2000, 200)
 d1 <- as.data.frame(d)
 d1 <- mutate(d1, GameIndex = 1:length(d))
@@ -315,7 +313,7 @@ d2 <- mutate(d2, GameIndex = 1:length(d2))
 colnames(d2) <- c("Profit", "GameIndex")
 mean(d2$Profit)
 ```
-As expected, with a higher number of chances, we are able to reach the full 1000$ profit(1000$ being the difference between the winning_threshold and the starting_budget) but we still end up with negative mean earnings of -100.76.
+As expected, with a higher number of chances, we are able to reach the full 1000$ profit(1000$ being the difference between the winning_threshold and the starting_budget) but we still end up with negative mean earnings of -95.322.
 
 The below chunk of code calculates the average number of plays before a stopping condition is achieved.
 ```{r}
@@ -334,10 +332,11 @@ return(mean(rep))
 
 
 ```{r}
+set.seed(2)
 AverageNumberofPlays(1000, 1000, 200, 300, 100)
 ```
 
-Here we find that the average number of plays using the initial given parameters is 208.807
+Here we find that the average number of plays using the initial given parameters is 209.455
 
 #Conclusion 
 
