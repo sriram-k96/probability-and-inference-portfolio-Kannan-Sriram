@@ -3,15 +3,15 @@ title: "Roulette Simulation"
 author: ' Sriram Kannan'
 date: "`r format(Sys.time(), '%09-%05-%2021')`"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
     code_folding: hide
     toc: yes
     number_sections: yes
     toc_depth: 3
     toc_float: yes
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
 ---
 # Introduction
 
@@ -231,6 +231,8 @@ library(ggplot2)
 ```
 
 This chunk of code shows how changing parameters based on the discussion above affects the outcome of the series of wagers i.e, gives us the distribution of earnings over games as well as average earnings over a series of games.
+
+In order to make the histogram viewable, it's shown for 20 repetitions but the distribution can be extended upto any number of required repetitions. The means/average earnings shown will be for 1000 repetitions. 
 ```{r}
 #.
 set.seed(1)
@@ -238,9 +240,13 @@ a <- PResult(20, 1000, 200, 300, 100)
 a1 <- as.data.frame(a)
 a1 <- mutate(a1, GameIndex = 1:length(a))
 colnames(a1) <- c("Profit", "GameIndex")
-ggplot(data = a1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
-mean(a1$Profit)
+ggplot(data = a1, aes(x = GameIndex, y = Profit)) + geom_histogram(stat = "identity") + labs(title = "Average Earnings Simulation (20 Repetitions)")
 
+a2 <- PResult(1000, 1000, 200, 300, 100)
+a2 <- as.data.frame(a2)
+a2 <- mutate(a2, GameIndex = 1:length(a2))
+colnames(a2) <- c("Profit", "GameIndex")
+mean(a2$Profit)
 # get_last <- function(x) x[length(x)]
 # 
 # 
@@ -261,7 +267,7 @@ mean(a1$Profit)
 
 
 ```
-With these set of parameters, we have a mean earnings of -5. 
+With these set of parameters, we have a mean earnings of -48.316. 
 
 ```{r}
 set.seed(1)
@@ -269,11 +275,17 @@ b<- PResult(20, 1000, 200, 500, 100)
 b1 <- as.data.frame(b)
 b1 <- mutate(b1, GameIndex = 1:length(b))
 colnames(b1) <- c("Profit", "GameIndex")
-ggplot(data = b1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation", xlab = "Profit", ylab = "Game Index")
-mean(b1$Profit)
+b2 <- b1 %>% group_by(Profit) %>% count() 
+colnames(b2) <- c("Profit", "Frequency")
+ggplot(data = b2, aes(x = Profit, y = Frequency)) + geom_col(stat = "identity") + labs(title = "Average Earnings Simulation(20 Repetitions)")
+b2<- PResult(1000, 1000, 200, 500, 100)
+b2 <- as.data.frame(b2)
+b2 <- mutate(b2, GameIndex = 1:length(b2))
+colnames(b2) <- c("Profit", "GameIndex")
+mean(b2$Profit)
 
 ```
-With these set of parameters, the mean earnings is -81.2. We had increased the winning threshold which proves to be problematic for the most part as the player would have to risk more to reach the higher winning threshold(to attain stopping condition) while having only 200$ to play around with. 
+With these set of parameters, the mean earnings is -96.324. We had increased the winning threshold which proves to be problematic for the most part as the player would have to risk more to reach the higher winning threshold(to attain stopping condition) while having only 200$ to play around with. 
 
 ```{r}
 set.seed(1)
@@ -281,27 +293,56 @@ c <- PResult(20, 1000, 1000, 2000, 200)
 c1 <- as.data.frame(c)
 c1 <- mutate(c1, GameIndex = 1:length(c))
 colnames(c1) <- c("Profit", "GameIndex")
-ggplot(data = c1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
-mean(c1$Profit)
+ggplot(data = c1, aes(x = GameIndex, y = Profit)) + geom_histogram(stat = "identity") + labs(title = "Average Earnings Simulation(20 Repetitions)")
+c2<- PResult(1000, 1000, 200, 500, 100)
+c2 <- as.data.frame(c2)
+c2 <- mutate(c2, GameIndex = 1:length(c2))
+colnames(c2) <- c("Profit", "GameIndex")
+mean(c2$Profit)
 ```
-With these set of parameters, the mean earnings is -123.35 (We seem to have some sorely unlucky series of games so far!). We had increased the starting threshold and adjusted the winning threshold as well and the results don't seem too promising in this case either. An interesting observation is that the winning threshold is never reached (it would be reached with much higher repetitions but clearly, the probability is low. And the 1000 turn limit was actually used up in case of positive profits.). Perhaps more turns could deliver a full 1000$ profit? Let's explore that below. 
+With these set of parameters, the mean earnings is -97.798 (We seem to have some sorely unlucky series of games so far!). We had increased the starting threshold and adjusted the winning threshold as well and the results don't seem too promising in this case either. An interesting observation is that the winning threshold is never reached (it would be reached with much higher repetitions but clearly, the probability is low. And the 1000 turn limit was actually used up in case of positive profits.). Perhaps more turns could deliver a full 1000$ profit? Let's explore that below. 
 
 ```{r}
-set.seed(1)
+set.seed(2)
 d <- PResult(20, 10000, 1000, 2000, 200)
 d1 <- as.data.frame(d)
 d1 <- mutate(d1, GameIndex = 1:length(d))
 colnames(d1) <- c("Profit", "GameIndex")
-ggplot(data = d1, aes(x = GameIndex, y = Profit)) + geom_bar(stat = "identity") + labs(title = "Average Earnings Simulation")
-mean(d1$Profit)
+ggplot(data = d1, aes(x = GameIndex, y = Profit)) + geom_histogram(stat = "identity") + labs(title = "Average Earnings Simulation(20 Repetitions)")
+d2<- PResult(1000, 1000, 200, 500, 100)
+d2 <- as.data.frame(d2)
+d2 <- mutate(d2, GameIndex = 1:length(d2))
+colnames(d2) <- c("Profit", "GameIndex")
+mean(d2$Profit)
 ```
-As expected, with a higher number of chances, we are able to reach the full 1000$ profit(1000$ being the difference between the winning_threshold and the starting_budget) but we still end up with a poor mean earnings of -700.
+As expected, with a higher number of chances, we are able to reach the full 1000$ profit(1000$ being the difference between the winning_threshold and the starting_budget) but we still end up with negative mean earnings of -100.76.
+
+The below chunk of code calculates the average number of plays before a stopping condition is achieved.
+```{r}
+NumberofPlays <- function(ledger){
+  n <- nrow(ledger)
+  return(n)
+}
+
+AverageNumberofPlays <- function(r, max_games, starting_budget, winning_threshold, max_wager)
+{
+rep <- c(replicate(r, NumberofPlays(one_series(max_games, starting_budget, winning_threshold, max_wager))))
+return(mean(rep))
+}
+
+```
+
+
+```{r}
+AverageNumberofPlays(1000, 1000, 200, 300, 100)
+```
+
+Here we find that the average number of plays using the initial given parameters is 208.807
 
 #Conclusion 
 
 Using the above observations, we can clearly see that Martingale's strategy while not a slam dunk in every scenario. This can be extended to state that based on a set of static conditions, Martingale's strategy is not a definite win strategy. It can however be considered a definite win strategy if there are no constraints(i.e, no budget limitations, no betting limitations etc) or if the constraints the dynamic (i.e, the starting budget can be completely controlled by the player as the game progresses - this alone could greatly increase the winning chances if the number of plays or the betting limit is high enough.). The more dynamic constraints, the faster/less number of turns it'll take to gain a positive outcome. Dynamically changing the winning threshold based on previous turns by the player also would guarantee a success provided the dynamic starting budget and reasonably high max number of turns. 
 
-```{r}
-install.packages("htmltools")
+
 ```
 
