@@ -1,0 +1,32 @@
+---
+title: "02b-Interview Question"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r}
+require(tgsify)
+```
+
+```{r}
+one_rep <- function() {
+Coin_State = sample(c("B", "F", "F", "F", "F"), 1)
+P <- .5 + .25*(Coin_State == "B")
+result <- rbinom(4,1,P) %>% paste0(collapse = "")
+c(Coin = Coin_State, Result = result)
+}
+```
+
+```{r}
+one_rep()
+```
+
+```{r}
+replicate(100000, one_rep()) %>% 
+  t %>% data.frame %>%
+  mutate(HHHH = 1*(Result == "1111")) %>%
+  with({gmodels::CrossTable(HHHH, Coin)})
+```
+
