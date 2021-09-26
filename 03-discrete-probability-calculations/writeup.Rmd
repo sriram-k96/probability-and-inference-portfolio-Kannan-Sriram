@@ -1,0 +1,110 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Introduction 
+
+This Blog Post will answer series of questions related to the World Series based on rules of probability and discrete probability functions. The world series is a best-of-7 match-up between the champions of the American and National Leagues of Major League Baseball.
+
+Setup:
+
+Suppose that the Braves and the Yankees are teams competing in the World Series.
+Suppose that in any given game, the probability that the Braves win is PB and the probability that the Yankees win is PY = (1-PB)
+
+A condition for these scenarios is that each event is independent and one event does not affect another.
+
+1) What is the probability that the Braves win the World Series given that PB = 0.55?
+
+```{r}
+dbinom(4,7,0.55) + dbinom(5,7,0.55) + dbinom(6,7,0.55) + dbinom(7,7,0.55)
+```
+The World Series is a best of 7 hence, The braves would need to win at least 4 games in a 7 match series. So the number of wins can be 4,5,6 or 7. We add the respective probabilities of getting those wins and the result is 0.6082878
+
+2) What is the probability that the Braves win the World Series given that PB=x? 
+
+```{r}
+p = c(0.5, 0.6, 0.7, 0.8, 0.9, 1)
+pr = c()
+for (i in 1:length(p))
+{
+  pr[i] = dbinom(4,7,p[i]) + dbinom(5,7,p[i]) + dbinom(6,7,p[i]) + dbinom(7,7,p[i])
+
+}
+pr
+```
+```{r}
+plot(p, pr, xlab = "Probability of Braves winning a Head to Head matchup" , ylab = "Pr(Win World Series)", title = "Probability of winning the world series" , ylim = c(0.0, 1.0))
+```
+The above figures show the probability that the Braves win the world series given a range of probabilities that the Braves win a single game. 
+
+3) Suppose one could change the World Series to be best-of-9 or some other best-of-X series. What is the shortest series length so that P(Braves win World Series|PB = .55) ≥ 0.8
+
+```{r}
+x = 0
+n = 9
+while(x <= 0.8)
+{
+    c = ceiling(n/2)
+    v = c()
+    x = 0
+    while (c <= n)
+    {
+      db = dbinom(c, n, 0.55)
+      x = x+db
+      c = c+1
+    }
+  n = n + 2
+}
+print(n-2)
+
+```
+Since it's a best of x(x is always odd) series, we need at least x/2 (rounded-up) wins. Hence we loop x starting from 9 by increments of 2 until the condition of probability of at least 0.8 or the closest value above 0.8 is fulfilled. Hence we need a  Best of 71 series so that P(Braves win World Series|PB = .55) ≥ 0.8
+
+```{r}
+dbinom(5,9,0.55) + dbinom(6,9,0.55) + dbinom(7,9,0.55) + dbinom(8,9,0.55) + dbinom(9,9,0.55)
+```
+4) What is the shortest series length so that P(Braves win World Series|PB = x) ≥ 0.8? 
+
+```{r}
+pr2 = c()
+p2 = c(0.502, 0.503, 0.504, 0.505, 0.51, 0.52, 0.53, 0.54, 0.55, 0.6, 0.7, 0.8, 0.9, 1)
+for (i in 1:length(p2))
+{
+  x = 0
+  n = 1
+  while(x <= 0.8)
+  {
+    c = ceiling(n/2)
+    v = c()
+    x = 0
+    while (c <= n)
+    {
+      db = dbinom(c, n, p2[i])
+      x = x+db
+      c = c+1
+    }
+  n = n + 2
+  }
+  pr2[i] = n-2
+}
+pr2
+```
+```{r}
+plot(p2, pr2, xlab = "Probability of Braves winning a Head to Head matchup" , ylab = "Series Length", title = "Shortest Series so that P(Win WS given p) >= 0.8" )
+
+```
+The above graph shows the respective shortest lengths so that P(Braves win World Series|PB = x) ≥ 0.8 where Pb = x is represented by a range of probabilities. An important observation here is that as x approaches 0.5, the series length exponentially increases. In fact at Pb = 0.5, the series length approaches infinity, hence a series of Pb values progressively closer to 0.5 were chosen to simulate this. 
+
+5) Calculate P(PB = 0.55|Braves win World Series in 7 games) under the assumption that either PB = 0.55 or PB = 0.45. Explain your solution.
+
+Possible PB Values = 0.45, 0.55
+Given that Braves win world series in 7 games, it implies that they won exactly 4 games. 
+```{r}
+dbinom(4,7,0.55)
+dbinom(4,7,0.45)
+
+```
+
