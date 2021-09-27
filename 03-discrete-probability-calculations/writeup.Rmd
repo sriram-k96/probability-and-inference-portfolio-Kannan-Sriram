@@ -1,8 +1,14 @@
 ---
-title: "R Notebook"
+title: "03-discrete-probability-calculations"
+author: ' Sriram Kannan'
+date: "`r format(Sys.time(), '%09-%27-%2021')`"
 output:
   html_document:
-    df_print: paged
+    code_folding: hide
+    toc: yes
+    number_sections: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 # Introduction 
