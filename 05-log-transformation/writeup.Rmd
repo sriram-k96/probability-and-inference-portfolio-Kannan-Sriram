@@ -1,0 +1,252 @@
+---
+title: "05-log-transformation"
+author: ' Sriram Kannan'
+date: "`r format(Sys.time(), '%10-%11-%2021')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: yes
+    number_sections: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+Part 1
+For each distribution below, generate a figure of the PDF and CDF. Mark the mean and median in the figure.
+
+For each distribution below, generate a figure of the PDF and CDF of the transformation Y = log(X) random variable. Mark the mean and median in the figure. You may use simulation or analytic methods in order find the PDF and CDF of the transformation.
+
+For each of the distributions below, generate 1000 samples of size 100. For each sample, calculate the geometric and arithmetic mean. Generate a scatter plot of the geometic and arithmetic sample means. Add the line of identify as a reference line.
+
+Generate a histogram of the difference between the arithmetic mean and the geometric mean.
+
+Distribution 1
+X∼GAMMA(shape=3,scale=1)
+
+Mean of a Gamma Distribution where Shape and Scale are the parameters used is given by :
+Mean = shape/scale
+There is no closed form for the median hence we use the empirical formula between mean, median and mode to calculate median : 
+Median = (2*mean + mode)/3 
+where mode of a gamma distribution where Shape and Scale are the parameters used is given by 
+Mode = (shape - 1)*scale where shape >= 1
+
+Log of mean and median is taken in order to find out the mean and median of the log transformed respective distribution. 
+```{r}
+shape = 3
+scale = 1
+mean = shape/scale
+mode = (shape - 1)*scale
+median = (2*mean + mode)/3
+logmean = log(shape/scale)
+logmedian = log(median)
+
+#PDF
+plot(dgamma(0:15, shape = shape, scale = scale), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Gamma Distribution")
+abline(v = mean, col = "red") 
+abline(v = median, col = "black")
+
+#CDF
+plot(pgamma(0:15, shape = 3, scale = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Gamma Distribution")
+abline(v = mean, col = "red")
+abline(v = median, col = "black")
+
+#PDF of log(X)
+plot(dgamma(0:15, shape = 3, scale = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Gamma Distribution")
+abline(v = logmean, col = "red")
+abline(v = logmedian, col = "black")
+
+#CDF of log(X)
+plot(log(pgamma(log(0:15), shape = 3, scale = 1)), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Gamma Distribution")
+abline(v = logmean, col = "red")
+abline(v = logmedian, col = "black")
+
+```
+The above plots provide the PDF and CDF of the Gamma Distribution with shape = 1 and scale = 3 and their log transformed versions. The red and black lines denote the mean and median of the respective distributions. 
+
+
+```{r}
+mgamma = c()
+gmgamma = c()
+for (i in 1:1000)
+{
+  gamma <- rgamma(1:100, shape = 3, scale = 1)
+  m <- mean(gamma)
+  gm <- exp(mean(log(gamma)))
+  mgamma[i] <- m
+  gmgamma[i] <- gm
+}
+
+plot(mgamma, gmgamma, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Gamma Distribution")
+
+hist(mgamma - gmgamma, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Gamma Distribution")
+```
+The above plots show the scatter plot between Arithmetic and Geometric Mean of the Gamma Distribution and the histogram of differences between Arithmetic and Geometric Mean. We see that Arithmetic Mean is always greater than Geometric mean in this case by at least 0.3. 
+
+Distribution 2
+X∼LOG NORMAL(μ=−1,σ=1)
+
+The mean of the log normal distribution is given by :
+Mean = exp(μ + (σ^2)/2)
+The median of the log normal distribution is given by : 
+Median = exp(μ)
+
+Log of mean and median is taken in order to find out the mean and median of the log transformed respective distribution. 
+
+```{r}
+meanlog = -1
+sdlog = 1
+meanln = exp(meanlog + (sdlog^2)/2)
+medianln = exp(meanlog)
+logmeanln = log(meanln)
+logmedianln = log(medianln)
+
+#PDF
+plot(dlnorm(0:15, meanlog = -1, sdlog = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Log Normal Distribution")
+abline(v = meanln, col = "red") 
+abline(v = medianln, col = "black")
+
+#CDF
+plot(plnorm(0:15, meanlog = -1, sdlog = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Normal Distribution")
+abline(v = meanln, col = "red")
+abline(v = medianln, col = "black")
+
+#PDF of log(X)
+plot(dlnorm(0:15, meanlog = -1, sdlog = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Log Normal Distribution")
+abline(v = logmeanln, col = "red")
+abline(v = logmedianln, col = "black")
+
+#CDF of log(X)
+plot(plnorm(0:15, meanlog = -1, sdlog = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Log Normal Distribution")
+abline(v = logmeanln, col = "red")
+abline(v = logmedianln, col = "black")
+```
+The above plots provide the PDF and CDF of the Log Normal Distribution with μ = -1 and σ = 1 and their log transformed versions. The red and black lines denote the mean and median of the respective distributions.
+
+```{r}
+mln = c()
+gmln = c()
+for (i in 1:1000)
+{
+  ln <- rlnorm(1:100, meanlog = -1, sdlog = 1)
+  m <- mean(ln)
+  gm <- exp(mean(log(ln)))
+  mln[i] <- m
+  gmln[i] <- gm
+}
+
+plot(mln, gmln, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Log Normal Distribution")
+
+hist(mln - gmln, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Log Normal Distribution")
+```
+The above plots show the scatter plot between Arithmetic and Geometric Mean of the Log Normal Distribution and the histogram of differences between Arithmetic and Geometric Mean. We see that Arithmetic Mean is always greater than Geometric mean in this case by at least 0.1.
+
+Distribution 3
+X∼UNIFORM(0,12)
+
+The mean and median of the uniform distribution are equal:
+Mean = Median = (a+b)/2
+
+```{r}
+min = 0
+max = 12
+meanu = (min + max)/2
+logmeanu = log(meanu)
+
+#PDF
+plot(dunif(0:15, min = 0, max= 12), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Uniform Distribution")
+abline(v = meanu, col = "red") 
+#abline(v = meanu, col = "black")
+
+#CDF
+plot(punif(0:15, min = 0, max= 12), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Uniform Distribution")
+abline(v = meanu, col = "red")
+#abline(v = meanu, col = "black")
+
+#PDF of log(X)
+plot(dunif(0:15, min = 0, max= 12, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Uniform Distribution")
+abline(v = logmeanu, col = "red")
+#abline(v = logmeanu, col = "black")
+
+#CDF of log(X)
+plot(punif(0:15, min = 0, max= 12, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Uniform Distribution")
+abline(v = logmeanu, col = "red")
+#abline(v = logmeanu, col = "black")
+```
+The above plots provide the PDF and CDF of the Uniform Distribution with a = 0 and b = 12 and their log transformed versions. The red line denotes the mean and median of the respective distributions as they are equal.
+
+```{r}
+mu = c()
+gmu = c()
+for (i in 1:1000)
+{
+  u <- runif(1:100, min = 0, max = 12)
+  m <- mean(u)
+  gm <- exp(mean(log(u)))
+  mu[i] <- m
+  gmu[i] <- gm
+}
+
+plot(mu, gmu, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Uniform Distribution")
+hist(mu - gmu, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Uniform Distribution")
+```
+The above plots show the scatter plot between Arithmetic and Geometric Mean of the Uniform Distribution and the histogram of differences between Arithmetic and Geometric Mean. We see that Arithmetic Mean is always greater than Geometric mean in this case by at least 0.9
+
+Part 2 (OPTIONAL)
+Show that if Xi>0 for all i, then the arithmetic mean is greater than or equal to the geometric mean.
+
+```{r}
+
+```
+
+Part 3
+What is the correct relationship between E[log(X)] and log(E[X])? Is one always larger? Equal? Explain your answer.
+
+E[log(x)] = mean(log(X)) 
+log(E(X)) = log(mean(X))
+
+Where X is a random variable of any distribution. We will take the difference between E[log(X)] and log(E[X]) using simulation. We will simulate Gamma, Uniform and Log Normal Distributions. 
+
+```{r}
+mlu = c()
+lmu = c()
+for (i in 1:1000)
+{
+  lu <- log(runif(1:1000, min = 2, max = 17))
+  u <- runif(1:1000, min = 2, max = 17)
+  m <- mean(lu)
+  l <- mean(u)
+  mlu[i] <- m
+  lmu[i] <- l
+}
+hist(mlu - log(lmu), xlab = "Difference between E[log(X)] and log(E[X])", main = "Histogram of Diff. between E[log(X)] and log(E[X]) - Uniform Dist.")
+
+mlln = c()
+lmln = c()
+for (i in 1:1000)
+{
+  lln <- log(rlnorm(1:1000, meanlog = 3, sdlog = 2))
+  ln <- rlnorm(1:1000, meanlog = 3, sdlog = 2)
+  m <- mean(lln)
+  l <- mean(ln)
+  mlln[i] <- m
+  lmln[i] <- l
+}
+hist(mlln - log(lmln), xlab = "Difference between E[log(X)] and log(E[X])", main = "Histogram of Diff. between E[log(X)] and log(E[X]) - Log Normal Dist.")
+
+mg = c()
+lmg = c()
+for (i in 1:1000)
+{
+  lg <- log(rgamma(1:1000, scale = 2, shape = 4))
+  g <- rgamma(1:1000, scale = 5, shape = 16)
+  m <- mean(lg)
+  l <- mean(g)
+  mg[i] <- m
+  lmg[i] <- l
+}
+hist(mg - log(lmg), xlab = "Difference between E[log(X)] and log(E[X])", main = "Histogram of Diff. between E[log(X)] and log(E[X]) - Gamma Dist.")
+
+```
+As seen in the simulation of the above distributions, it is clear that log(E[X]) is always greater than  E[log(X)]. (We could not by simulation say if both values could be equal)
+
+This phenomenon is explained by Jensen's inequality which states that the convex transformation of a mean is less than or equal to the mean applied after the convex transformation. The Logarithm being a concave transformation, by corollary, the opposite is true. Hence the concave transformation of a mean is greater than or equal to the mean applied after the concave transformation.
