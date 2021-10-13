@@ -116,7 +116,7 @@ Given that Braves win world series in 7 games, it implies that they won exactly 
 By Bayes Rule : 
 P(PB = 0.55|Braves win World Series in 7 games) = P(Braves win World Series in 7 games|PB = 0.55)*P(Pb = 0.55)/P(Braves win world Series in 7 games)
 ```{r}
-dnbinom(3,4,0.55)*0.5/dnbinom(3,4,0.55)*0.5 + dnbinom(3,4,0.45)*0.5
+dnbinom(3,4,0.55)*0.5/(dnbinom(3,4,0.55)*0.5 + dnbinom(3,4,0.45)*0.5)
 
 ```
 Thus Probability that Braves win the Series in 7 games given Pb = 0.55 under the above conditions is 0.318

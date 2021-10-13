@@ -365,8 +365,8 @@ pr2</code></pre>
 </ol>
 <p>Possible PB Values = 0.45, 0.55 hence there’s a 0.5 probability that Pb is either of the 2 values Given that Braves win world series in 7 games, it implies that they won exactly 4 games in 7 games played.</p>
 <p>By Bayes Rule : P(PB = 0.55|Braves win World Series in 7 games) = P(Braves win World Series in 7 games|PB = 0.55)*P(Pb = 0.55)/P(Braves win world Series in 7 games)</p>
-<pre class="r"><code>dnbinom(3,4,0.55)*0.5/dnbinom(3,4,0.55)*0.5 + dnbinom(3,4,0.45)*0.5</code></pre>
-<pre><code>## [1] 0.3182241</code></pre>
+<pre class="r"><code>dnbinom(3,4,0.55)*0.5/(dnbinom(3,4,0.55)*0.5 + dnbinom(3,4,0.45)*0.5)</code></pre>
+<pre><code>## [1] 0.55</code></pre>
 <p>Thus Probability that Braves win the Series in 7 games given Pb = 0.55 under the above conditions is 0.318</p>
 </div>
 
