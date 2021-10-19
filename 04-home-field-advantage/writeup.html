@@ -276,22 +276,9 @@ div.tocify {
 <ol style="list-style-type: decimal">
 <li>Compute analytically the probability that the Braves win the world series when the sequence of game locations is {NYC, NYC, ATL, ATL, ATL, NYC, NYC}. Calculate the probability with and without home field advantage when PB =0.55. What is the difference in probabilities?</li>
 </ol>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(data.table)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;data.table&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     between, first, last</code></pre>
-<pre class="r"><code># Get all possible outcomes
+<pre class="r"><code>library(dplyr)
+library(data.table)
+# Get all possible outcomes
 apo &lt;- fread(&quot;./all-possible-world-series-outcomes.csv&quot;)
 
 # Game Schedule - {NYC, NYC, ATL, ATL, ATL, NYC, NYC}
@@ -334,7 +321,8 @@ for(i in 1:nrow(apo)){
 <ol start="2" style="list-style-type: decimal">
 <li>Calculate the same probabilities as the previous question by simulation.</li>
 </ol>
-<pre class="r"><code>hfi &lt;- c(0,0,1,1,1,0,0)
+<pre class="r"><code>set.seed(2)
+hfi &lt;- c(0,0,1,1,1,0,0)
 
 pb &lt;- 0.55
 advantage_multiplier &lt;- 1.1
@@ -358,7 +346,26 @@ for(i in 1:10000){
 # Probability of World Series Outcome with the Braves Winning
 
 (BravesHomeFieldAdvantageSim &lt;- sum(res == 1)/r)</code></pre>
-<pre><code>## [1] 0.5983</code></pre>
+<pre><code>## [1] 0.6022</code></pre>
+<pre class="r"><code>set.seed(2)
+resnh = rep(NA_real_, 10000)
+for (i in 1:10000)
+  {
+    prob_gamenh &lt;- rep(NA_real_, 7)
+   for(j in 1:7){
+     prob_gamenh[j] = rbinom(1, 1, 0.55)}
+  if(sum(prob_gamenh) &gt;= 4){
+    resnh[i] &lt;- 1
+  } else {
+    resnh[i] &lt;- 0
+  }
+}
+
+(BravesNoHomeFieldAdvantageSim &lt;- sum(resnh == 1)/r)</code></pre>
+<pre><code>## [1] 0.6057</code></pre>
+<pre class="r"><code>(DifferenceSim = BravesHomeFieldAdvantageSim - BravesNoHomeFieldAdvantageSim)</code></pre>
+<pre><code>## [1] -0.0035</code></pre>
+<p>By Simulation, The Braves have a Probability of 0.6022 of Winning the World Series with Home Field Advantage and 0.6057 without Home Field Advantage. The Braves are thus less likely by a Probability of 0.0035 to win the World Series with Home Field Advantage. The values observed with simulation are relatively close to our analytical solutions.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>What is the absolute and relative error for your simulation in the previous question?</li>
 </ol>
@@ -368,10 +375,15 @@ for(i in 1:10000){
 <p>relative error = |pcap - p|/p</p>
 <p>In this case, pcap denotes BravesHomeFieldAdvantageSim and p denotes BravesHomeFieldAdvantage</p>
 <p>Our number of trials in an experiment (r) is fixed at 10000.</p>
-<pre class="r"><code>(absolute_error = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage))</code></pre>
-<pre><code>## [1] 0.005920972</code></pre>
-<pre class="r"><code>(relative_error = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage)/BravesHomeFieldAdvantage)</code></pre>
-<pre><code>## [1] 0.009799348</code></pre>
+<pre class="r"><code>(absolute_errorhfa = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage))</code></pre>
+<pre><code>## [1] 0.002020972</code></pre>
+<pre class="r"><code>(relative_errorhfa = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage)/BravesHomeFieldAdvantage)</code></pre>
+<pre><code>## [1] 0.003344756</code></pre>
+<pre class="r"><code>(absolute_errornhfa = abs(BravesNoHomeFieldAdvantageSim - BravesNoHomefieldAdvantage))</code></pre>
+<pre><code>## [1] 0.002587797</code></pre>
+<pre class="r"><code>(relative_errornhfa = abs(BravesNoHomeFieldAdvantageSim - BravesNoHomefieldAdvantage)/BravesNoHomefieldAdvantage)</code></pre>
+<pre><code>## [1] 0.004254231</code></pre>
+<p>We thus observe that the absolute error for home field advantage is 0.00202 and for no home field advantage is 0.00258. The relative error for home field advantage is 0.0033 and for no home field advantage is 0.0042.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>Does the difference in probabilities (with vs without home field advantage) depend on PB? (Generate a plot to answer this question.)</li>
 </ol>

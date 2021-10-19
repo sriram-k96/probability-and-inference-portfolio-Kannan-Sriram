@@ -9,6 +9,7 @@ output:
     number_sections: yes
     toc_depth: 3
     toc_float: yes
+
 ---
 
 
@@ -34,7 +35,7 @@ Let PB be the probability that the Braves win a single head-to-head match-up wit
 
 1) Compute analytically the probability that the Braves win the world series when the sequence of game locations is {NYC, NYC, ATL, ATL, ATL, NYC, NYC}. Calculate the probability with and without home field advantage when PB =0.55. What is the difference in probabilities?
 
-```{r}
+```{r message = FALSE}
 library(dplyr)
 library(data.table)
 # Get all possible outcomes
@@ -80,6 +81,7 @@ The Braves have a Probability of 0.6042 of Winning the World Series with Home Fi
 2) Calculate the same probabilities as the previous question by simulation.
 
 ```{r}
+set.seed(2)
 hfi <- c(0,0,1,1,1,0,0)
 
 pb <- 0.55
@@ -108,6 +110,30 @@ for(i in 1:10000){
 
 ```
 
+```{r}
+set.seed(2)
+resnh = rep(NA_real_, 10000)
+for (i in 1:10000)
+  {
+    prob_gamenh <- rep(NA_real_, 7)
+   for(j in 1:7){
+     prob_gamenh[j] = rbinom(1, 1, 0.55)}
+  if(sum(prob_gamenh) >= 4){
+    resnh[i] <- 1
+  } else {
+    resnh[i] <- 0
+  }
+}
+
+(BravesNoHomeFieldAdvantageSim <- sum(resnh == 1)/r)
+  
+```
+```{r}
+(DifferenceSim = BravesHomeFieldAdvantageSim - BravesNoHomeFieldAdvantageSim)
+```
+
+By Simulation, The Braves have a Probability of 0.6022 of Winning the World Series with Home Field Advantage and 0.6057 without Home Field Advantage. The Braves are thus less likely by a Probability of 0.0035 to win the World Series with Home Field Advantage. The values observed with simulation are relatively close to our analytical solutions.
+
 3) What is the absolute and relative error for your simulation in the previous question?
 
 p denotes the true underlying probability
@@ -124,10 +150,14 @@ In this case, pcap denotes BravesHomeFieldAdvantageSim and p denotes BravesHomeF
 Our number of trials in an experiment (r) is fixed at 10000.
 
 ```{r}
-(absolute_error = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage))
-(relative_error = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage)/BravesHomeFieldAdvantage)
+(absolute_errorhfa = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage))
+(relative_errorhfa = abs(BravesHomeFieldAdvantageSim - BravesHomeFieldAdvantage)/BravesHomeFieldAdvantage)
+
+(absolute_errornhfa = abs(BravesNoHomeFieldAdvantageSim - BravesNoHomefieldAdvantage))
+(relative_errornhfa = abs(BravesNoHomeFieldAdvantageSim - BravesNoHomefieldAdvantage)/BravesNoHomefieldAdvantage)
 
 ```
+We thus observe that the absolute error for home field advantage is 0.00202 and for no home field advantage is 0.00258. The relative error for home field advantage is 0.0033 and for no home field advantage is 0.0042.
 
 4) Does the difference in probabilities (with vs without home field advantage) depend on PB? (Generate a plot to answer this question.)
 
