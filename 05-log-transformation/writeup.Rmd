@@ -77,6 +77,7 @@ for (i in 1:1000)
 }
 
 plot(mgamma, gmgamma, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Gamma Distribution")
+abline(coef = c(0,1))
 
 hist(mgamma - gmgamma, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Gamma Distribution")
 ```
@@ -143,6 +144,7 @@ for (i in 1:1000)
 }
 
 plot(mln, gmln, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Log Normal Distribution")
+abline(coef = c(0,1))
 
 hist(mln - gmln, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Log Normal Distribution")
 ```
@@ -204,6 +206,8 @@ for (i in 1:1000)
 }
 
 plot(mu, gmu, xlab = "Arithmetic Mean", ylab = "Geometric Mean", main = "Arithmetic Mean vs Geometric Mean - Uniform Distribution")
+abline(coef = c(0,1))
+
 hist(mu - gmu, xlab = "Difference between Arithmetic Mean and Geometric Mean", main = "Histogram of Difference between AM and GM - Uniform Distribution")
 ```
 The above plots show the scatter plot between Arithmetic and Geometric Mean of the Uniform Distribution and the histogram of differences between Arithmetic and Geometric Mean. We see that Arithmetic Mean is always greater than Geometric mean in this case by at least 0.9
