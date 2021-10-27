@@ -24,41 +24,41 @@ Distribution 1
 X∼GAMMA(shape=3,scale=1)
 
 Mean of a Gamma Distribution where Shape and Scale are the parameters used is given by :
-Mean = shape/scale
-There is no closed form for the median hence we use the empirical formula between mean, median and mode to calculate median : 
-Median = (2*mean + mode)/3 
-where mode of a gamma distribution where Shape and Scale are the parameters used is given by 
-Mode = (shape - 1)*scale where shape >= 1
+Mean = shape * scale
+We use the 0.5 Quantile to calculate the Median. 
 
 Log of mean and median is taken in order to find out the mean and median of the log transformed respective distribution. 
 ```{r}
-shape = 3
-scale = 1
-mean = shape/scale
-mode = (shape - 1)*scale
-median = (2*mean + mode)/3
-logmean = log(shape/scale)
-logmedian = log(median)
+x = seq(-1,10,by = 0.01)
+pdf = dgamma(x, shape = 3, scale = 1)
+cdf = pgamma(x, shape = 3, scale = 1)
+mean = 3 *1
+median = qgamma(0.5, shape = 3, scale = 1)
 
 #PDF
-plot(dgamma(0:15, shape = shape, scale = scale), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Gamma Distribution")
-abline(v = mean, col = "red") 
-abline(v = median, col = "black")
-
-#CDF
-plot(pgamma(0:15, shape = 3, scale = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Gamma Distribution")
+plot(x, pdf, type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Gamma Distribution")
 abline(v = mean, col = "red")
 abline(v = median, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#PDF of log(X)
-plot(dgamma(0:15, shape = 3, scale = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Gamma Distribution")
-abline(v = logmean, col = "red")
-abline(v = logmedian, col = "black")
+# #CDF
+plot(x, cdf, type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Gamma Distribution")
+abline(v = mean, col = "red")
+abline(v = median, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#CDF of log(X)
-plot(log(pgamma(log(0:15), shape = 3, scale = 1)), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Gamma Distribution")
-abline(v = logmean, col = "red")
-abline(v = logmedian, col = "black")
+#PDF of Log(X)
+y = rgamma(1000, shape = 3, scale = 1)
+plot(density(y), type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Log Transformation of Gamma Distribution" )
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
+
+# #CDF of Log(X)
+plot(ecdf(y), xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Gamma Distribution")
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
 ```
 The above plots provide the PDF and CDF of the Gamma Distribution with shape = 1 and scale = 3 and their log transformed versions. The red and black lines denote the mean and median of the respective distributions. 
@@ -90,35 +90,43 @@ Mean = exp(μ + (σ^2)/2)
 The median of the log normal distribution is given by : 
 Median = exp(μ)
 
-Log of mean and median is taken in order to find out the mean and median of the log transformed respective distribution. 
 
 ```{r}
 meanlog = -1
 sdlog = 1
 meanln = exp(meanlog + (sdlog^2)/2)
 medianln = exp(meanlog)
-logmeanln = log(meanln)
-logmedianln = log(medianln)
+
+
+x = seq(-1,10,by = 0.01)
+pdf = dlnorm(x,meanlog = -1, sdlog = 1)
+cdf = plnorm(x, meanlog = -1, sdlog = 1)
+
 
 #PDF
-plot(dlnorm(0:15, meanlog = -1, sdlog = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Log Normal Distribution")
-abline(v = meanln, col = "red") 
-abline(v = medianln, col = "black")
-
-#CDF
-plot(plnorm(0:15, meanlog = -1, sdlog = 1), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Normal Distribution")
+plot(x, pdf, type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Log Normal Distribution")
 abline(v = meanln, col = "red")
 abline(v = medianln, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#PDF of log(X)
-plot(dlnorm(0:15, meanlog = -1, sdlog = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Log Normal Distribution")
-abline(v = logmeanln, col = "red")
-abline(v = logmedianln, col = "black")
+# #CDF
+plot(x, cdf, type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Normal Distribution")
+abline(v = meanln, col = "red")
+abline(v = medianln, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#CDF of log(X)
-plot(plnorm(0:15, meanlog = -1, sdlog = 1, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Log Normal Distribution")
-abline(v = logmeanln, col = "red")
-abline(v = logmedianln, col = "black")
+#PDF of Log(X)
+y = rlnorm(1000, meanlog = -1, sdlog = 1)
+plot(density(y), type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Log Transformation of Log Normal Distribution" )
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
+
+# #CDF of Log(X)
+plot(ecdf(y), xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Log Normal Distribution")
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 ```
 The above plots provide the PDF and CDF of the Log Normal Distribution with μ = -1 and σ = 1 and their log transformed versions. The red and black lines denote the mean and median of the respective distributions.
 
@@ -150,27 +158,36 @@ Mean = Median = (a+b)/2
 min = 0
 max = 12
 meanu = (min + max)/2
-logmeanu = log(meanu)
+
+x = seq(-1,10,by = 0.01)
+pdf = dunif(x,min = 0, max = 12)
+cdf = punif(x, min = 0, max = 12)
 
 #PDF
-plot(dunif(0:15, min = 0, max= 12), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "PDF of Uniform Distribution")
-abline(v = meanu, col = "red") 
-#abline(v = meanu, col = "black")
-
-#CDF
-plot(punif(0:15, min = 0, max= 12), type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Uniform Distribution")
+plot(x, pdf, type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Uniform Distribution")
 abline(v = meanu, col = "red")
-#abline(v = meanu, col = "black")
+abline(v = meanu, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#PDF of log(X)
-plot(dunif(0:15, min = 0, max= 12, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "PDF of Log Transformed Uniform Distribution")
-abline(v = logmeanu, col = "red")
-#abline(v = logmeanu, col = "black")
+# #CDF
+plot(x, cdf, type = "l", xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Uniform Distribution")
+abline(v = meanu, col = "red")
+abline(v = meanu, col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
 
-#CDF of log(X)
-plot(punif(0:15, min = 0, max= 12, log = TRUE), type = "l", xlab = "Value of Log of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Uniform Distribution")
-abline(v = logmeanu, col = "red")
-#abline(v = logmeanu, col = "black")
+#PDF of Log(X)
+y = runif(1000, min = 0, max = 12)
+plot(density(y), type = "l", xlab = "Value of Random Variable", ylab = "Density", main = "PDF of Log Transformation of Uniform Distribution" )
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
+
+# #CDF of Log(X)
+plot(ecdf(y), xlab = "Value of Random Variable", ylab = "Probability", main = "CDF of Log Transformed Uniform Distribution")
+abline(v = mean(y), col = "red")
+abline(v = median(y), col = "black")
+legend("topright", c("mean", "median"), col = c("red", "black"), lty = c(1,1))
+
 ```
 The above plots provide the PDF and CDF of the Uniform Distribution with a = 0 and b = 12 and their log transformed versions. The red line denotes the mean and median of the respective distributions as they are equal.
 
