@@ -15,36 +15,53 @@ output:
 
 In this blog post, we examine Which quantiles of a continuous distribution can one estimate with more precision?  We answer a series of questions related to the variation of the median (and a range of other quantiles) using analytical methods.The median is an important quantity in data analysis. It represents the middle value of the data distribution. Estimates of the median, however, have a degree of uncertainty because (a) the estimates are calculated from a finite sample and (b) the data distribution of the underlying data is generally unknown.
 
-Note : I did not understand a significant portion of the Order Statistics topic. Will clarify a few key queries before reattempting and completed this deliverable. 
-
 # Questions
+Note : Deliverable is only partially complete due to some lingering queries. 
 
 Q: Begin with the median from a sample of N=200 from the standard normal distribution. Write an R function that is the density function for the median in this sample. Note that the 100th order statistic is approximately the median, and use the order statistic formula discussed in class. Generate a plot of the function.
 
 ```{r}
-# m = c()
-# for (i in 1:10000) {
-#  m[i] <- quantile(rnorm(200), probs = 0.5) 
-# }
-# hist(m, freq = FALSE, xlab = "Median Value of Standard Normal Distribution", main = "")
+dorder <- function(x,k,n){
+  k*
+  choose(n,k)*
+  (pnorm(x, 25, 6.5))^(k-1)*
+  (1-pnorm(x, 25, 6.5))^(n-k)*
+  dnorm(x, 25, 6.5)
+}
+
+curve(
+    dorder(x, 100, 200)
+  , 3
+  , 55
+  , xlab = parse(text="X[(100)]")
+  , ylab = "Density"
+)
 ```
 
 Q: Write an R function that is the probability function for the median in this sample. Use the order statistic formula discussed in class. Generate a plot of the function.
 
+
 ```{r}
-# m = c()
-# for (i in 1:10000) {
-#  m[i] <- quantile(rnorm(200), probs = 0.5) 
-# }
-# hist(m, xlab = "Median Value of Standard Normal Distribution", main = "")
+porder <- function(x,k,n){
+  pbinom(k-1, n, pnorm(x, 25, 6.5), lower.tail = FALSE)
+}
+
+curve(
+    porder(x, 100, 200)
+  , 3
+  , 45
+  , xlab = parse(text="X[(100)]")
+  , ylab = "Probability"
+)
 ```
+
 
 Q: Write an R function that is the quantile function for the median in this sample. (You have several options for how to write this function.) Generate a plot of the function.
 
 ```{r}
 m = c()
 for (i in 1:10000) {
- m[i] <- quantile(rnorm(200), probs = 0.5) 
+ m[i] <- quantile(rnorm(200, 25, 6.5), probs = 0.5) 
 }
 hist(m, freq = FALSE, xlab = "Median Value of Standard Normal Distribution", main = "")
 ```
@@ -52,6 +69,16 @@ hist(m, freq = FALSE, xlab = "Median Value of Standard Normal Distribution", mai
 Q: Simulate the sampling distribution for the median. Create a plot of the empirical CDF (ECDF). Overlay the plot of the ECDF with a plot of the CDF.
 
 ```{r}
+library(tidyverse)
+median <- array(NA, dim = c(10000,1))
+for(i in 1:nrow(median))
+  {
+    median[i, 1] <- rnorm(200, 25, 6.5) %>% median
+  }
+plot(ecdf(median), xlab = "Median", ylab = "Probability", main = "ECDF vs CDF of Sampling distribution of Median - Normal Distribution", col = "red")
+curve(porder(x, 100, 200), 3, 45, add = TRUE, col = "blue")
+legend("topleft", c("ECDF","CDF"), lwd = 3, col = c("red","blue"), bty = "n")
+
 
 ```
 
@@ -95,6 +122,7 @@ Q: Modify the dorder, porder, and qorder functions so that the functions take a 
 
 ```{r}
 
+
 ```
 
 Q: Generate the QQ plot for simulated data from the sampling distribution of the sample max and the theoretical largest order statistic distribution.
@@ -106,7 +134,15 @@ Q: Generate the QQ plot for simulated data from the sampling distribution of the
 Q: Modify the dorder, porder, and qorder functions so that the functions take new parameters dist and ... so that the functions will work for any continuous distribution that has d and p functions defined in R.
 
 ```{r}
-
+fd <- function(x,k,n,dist="norm",...){
+  F <- eval(parse(text="p" %|% dist))
+  f <- eval(parse(text="d" %|% dist))
+  k*
+    choose(n,k)*
+    (F(x, ...))^(k-1)*
+    (1-F(x, ...))^(n-k)*
+    f(x, ...)
+}
 ```
 
 Q: Use the newly modified functions to plot the probability and density functions for the sample min (N=200).
