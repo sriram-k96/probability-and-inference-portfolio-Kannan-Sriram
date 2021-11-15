@@ -19,6 +19,7 @@ In this blog post, we examine Which quantiles of a continuous distribution can o
 
 Q: Begin with the median from a sample of N=200 from the standard normal distribution. Write an R function that is the density function for the median in this sample. Note that the 100th order statistic is approximately the median, and use the order statistic formula discussed in class. Generate a plot of the function.
 
+The following function is based off the Probability Density function of the kth Order Statistic Formula. 
 ```{r}
 dorder <- function(x,k,n){
   k*
@@ -41,7 +42,7 @@ The above plot is the density function of the median in a sample of 200 in a sta
 
 Q: Write an R function that is the probability function for the median in this sample. Use the order statistic formula discussed in class. Generate a plot of the function.
 
-
+The following function is based off the Cumulative Distribution function of the kth Order Statistic Formula.
 ```{r}
 porder <- function(x,k,n){
   pbinom(k-1, n, pnorm(x, 25, 6.5), lower.tail = FALSE)
@@ -59,6 +60,7 @@ The above plot is the probability function of the median in a sample of 200 in a
 
 Q: Write an R function that is the quantile function for the median in this sample. Generate a plot of the function.
 
+The following function is based on the definition of a quantile being the Inverse of the Cumulative Distribution Function. We create a lookup table for a range of values corresponding to their probabilities and use linear interpolation to estimate the remaining values. 
 ```{r}
 library(tidyverse)
 k = 100
@@ -144,12 +146,13 @@ q_candidate <- qorder
 tm <- q_candidate((1:199)/200)
 sm <- quantile(median, probs = (1:199)/200)
 
-plot(tm,sm, xlab = "Theoretical quantile", ylab = "Sample quantile")
+plot(tm,sm, xlab = "Theoretical quantile(Median)", ylab = "Sample quantile(Median)")
 abline(0,1)
 
   
   
 ```
+The above plot is the QQ plot for the simulated data of the median relative to the known sampling distribution of the median. They simulated data closely agrees with the theoretical sampling distribution.
 
 Q: Modify the dorder, porder, and qorder functions so that the functions take a new parameter k (for the kt**h order statistic) so that the functions will work for any order statistic and not just the median.
 
@@ -178,9 +181,11 @@ qorder <- function(p, k, n){
 }
 
 ```
-The functions dorder, porder and qorder are already generalized and can take a new parameter k for the kth order statistic and not just the median. 
+The functions dorder, porder were already generalized and can take a new parameter k for the kth order statistic and not just the median. qorder function has been changed to use the uniroot method where we find the solution/root to the target probability.
 
 Q: Generate the QQ plot for simulated data from the sampling distribution of the sample max and the theoretical largest order statistic distribution.
+
+We use the last order Statistic, in this case 200 as the sample size is 200 for the maximum. 
 
 ```{r}
 max <- array(NA, dim = c(10000,1))
@@ -195,9 +200,10 @@ q_candidate <- qorder
 x <- q_candidate((1:199)/200, 200, 200)
 y <- quantile(max, probs = (1:199)/200)
 
-plot(x,y, xlab = "Theoretical quantile", ylab = "Sample quantile")
+plot(x,y, xlab = "Theoretical quantile(Maximum)", ylab = "Sample quantile(Maximum)")
 abline(0,1)
 ```
+The above plot is the QQ plot for the simulated data of the maximum relative to the known sampling distribution of the median. They simulated data closely agrees with the theoretical sampling distribution.
 
 Q: Modify the dorder, porder, and qorder functions so that the functions take new parameters dist and ... so that the functions will work for any continuous distribution that has d and p functions defined in R.
 
@@ -243,7 +249,7 @@ curve(
     dorder(x, 1, 200, mean = 2, sd = 3)
   , -15
   , 10
-  , xlab = "Min"
+  , xlab = "Minimum"
   , ylab = "Density"
 )
 
@@ -251,7 +257,7 @@ curve(
     porder(x, 1, 200, mean = 2, sd = 3)
   , -15
   , 10
-  , xlab = "Min"
+  , xlab = "Minimum"
   , ylab = "Density"
 )
 
