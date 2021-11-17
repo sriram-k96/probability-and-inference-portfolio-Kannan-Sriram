@@ -191,7 +191,7 @@ qorder <- function(p, k, n){
 }
 
 ```
-The functions dorder, porder were already generalized and can take a new parameter k for the kth order statistic and not just the median. qorder function has been changed to use the uniroot method where we find the solution/root to the target probability.
+The functions dorder, porder and qorder were already generalized and can take a new parameter k for the kth order statistic and not just the median.
 
 Q: Generate the QQ plot for simulated data from the sampling distribution of the sample max and the theoretical largest order statistic distribution.
 
