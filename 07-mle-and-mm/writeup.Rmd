@@ -27,7 +27,10 @@ d1 <- nhgh %>%
   filter(1:n()<=1000)
 ```
 
-We will be using the Gamma Distribution, Normal Distribution and the Weibull Distribution in this tutorial. All 3 distributions are 2 Parameter Distributions and this we will be defining 2 Sample Moments for the Method of Moments for each of the attributes we'd like to model - i.e, Glycohemoglobin (gh) and Height of adult females(ht)
+We will be using the Gamma Distribution, Normal Distribution and the Weibull Distribution in this tutorial.
+
+#Method of Moments 
+All 3 distributions are 2 Parameter Distributions and we will be defining 2 Sample Moments for the Method of Moments for each of the attributes we'd like to model - i.e, Glycohemoglobin (gh) and Height of adult females(ht)
 
 ```{r}
 xbargh = mean(d1$gh)
@@ -63,14 +66,23 @@ curve(Fhtgamma(x), add = TRUE, col = "blue", lwd = 3)
 fghgamma <- function(x){dgamma(x, shape = shape_hatgh, scale = scale_hatgh)}
 fhtgamma <- function(x){dgamma(x, shape = shape_hatht, scale = scale_hatht)}
 
-hist(d1$gh, freq = FALSE, main = "PDF of Glycohemoglobin - Gamma Distribution")
+hist(d1$gh, breaks = 100, freq = FALSE, main = "PDF of Glycohemoglobin - Gamma Distribution")
 curve(fghgamma(x), add = TRUE, col = "blue", lwd = 3)
 
-hist(d1$ht, freq = FALSE, main = "PDF of Adult Females - Gamma Distribution")
+hist(d1$ht, breaks = 100, freq = FALSE, main = "PDF of Adult Females - Gamma Distribution")
 curve(fhtgamma(x), add = TRUE, col = "blue", lwd = 3)
 
+sq <- seq(0.05,0.95,by=0.05)
+qtgh <- quantile(d1$gh, sq)
+qtht <- quantile(d1$ht, sq)
+qggh <- qgamma(sq, shape = shape_hatgh, scale = scale_hatgh)
+qght <- qgamma(sq, shape = shape_hatht, scale = scale_hatht)
+plot(qggh,qtgh, main="QQ-Plot of Glycohemoglobin - Gamma Distribution ")
+abline(0,1)
+plot(qght,qtht, main="QQ-Plot of Height of Adult Females - Gamma Distribution")
+abline(0,1)
 ```
-Method of Moments using Gamma Distribution seems to be a reasonable fit for the Height of Adult Females data as per both the generated CDF closely matching the ecdf as well as the generated PDF closely matching the histogram. The Glycohemoglobin data on the other hand seems to be a poor match for the Gamma Distribution due to sigificant variation of the generated CDF from the ecdf as well as a massive variation in the generated PDF where it fails to capture the peaks of the data. 
+Method of Moments using Gamma Distribution seems to be a reasonable fit for the Height of Adult Females data as per both the generated CDF closely matching the ecdf as well as the generated PDF closely matching the histogram. The Glycohemoglobin data on the other hand seems to be a poor match for the Gamma Distribution due to sigificant variation of the generated CDF from the ecdf as well as a massive variation in the generated PDF where it fails to capture the peaks of the data. The QQ plot using the Gamma Distribution seems to be a great fit for Height of Adult Females data but a poor fit for the Glycohemoglobin data.
 
 Method of Moments - Normal Distribution
 
@@ -78,10 +90,10 @@ In the Normal Distribution, since it's standardized, the Population Moments are 
 
 ```{r}
 meangh <- xbargh
-stdgh <- s2gh
+stdgh <- sqrt(s2gh)
 
 meanht <- xbarht
-stdht <- s2ht
+stdht <- sqrt(s2ht)
 
 Fghnorm <- function(x){
 pnorm(x, mean = meangh, sd = stdgh)
@@ -91,28 +103,350 @@ Fhtnorm <- function(x){
 pnorm(x, mean = meanht, sd = stdht)
 }
 
-plot(ecdf(d1$gh))
-curve(Fghnorm(x), add = TRUE, col = "blue", lwd = 3, main = "gh")
+plot(ecdf(d1$gh), main = "CDF of Glycohemoglobin - Normal Distribution")
+curve(Fghnorm(x), add = TRUE, col = "blue", lwd = 3)
 
-plot(ecdf(d1$ht))
-curve(Fhtnorm(x), add = TRUE, col = "blue", lwd = 3, main = "ht")
+plot(ecdf(d1$ht), main = "CDF of Height of Adult Females - Normal Distribution")
+curve(Fhtnorm(x), add = TRUE, col = "blue", lwd = 3)
 
 fghnorm <- function(x){dnorm(x, mean = meangh, sd = stdgh)}
 fhtnorm <- function(x){dnorm(x, mean = meanht, sd = stdht)}
 
-hist(d1$gh, freq = FALSE, main = "gh")
-curve(fghnorm(x), add = TRUE, col = "blue", lwd = 3, main = "gh")
+hist(d1$gh, breaks = 100, freq = FALSE, main = "PDF of Glycohemoglobin - Normal Distribution")
+curve(fghnorm(x), add = TRUE, col = "blue", lwd = 3)
 
-hist(d1$ht, freq = FALSE, main = "ht")
-curve(fhtnorm(x), add = TRUE, col = "blue", lwd = 3, main = "ht")
+hist(d1$ht, breaks = 100, freq = FALSE, main = "PDF of Height of Adult Females - Normal Distribution")
+curve(fhtnorm(x), add = TRUE, col = "blue", lwd = 3)
+
+qnormgh <- qnorm(sq, mean = meangh, sd = stdgh)
+qnormht <- qnorm(sq, mean = meanht, sd = stdht)
+plot(qnormgh,qtgh, main="QQ-Plot of Glycohemoglobin - Normal Distribution ")
+abline(0,1)
+plot(qnormht,qtht, main="QQ-Plot of Height of Adult Females - Normal Distribution")
+abline(0,1)
 ```
-Method of Moments using the Normal Distribution seems to be a poor fit for both Glycohemoglobin as well as the Height of Adult Females as significant deviations from the ecdf and the histograms are observed in Glycohemoglobin data while the CDF and the PDF generated by moments look completely different in case of the height of Adult Females Data. 
+Method of Moments using the Normal Distribution seems to be a poor fit for Glycohemoglobin  as significant deviations from the ecdf and the histograms are observed in Glycohemoglobin data while it seems to be a decent fit for the Height of Adult Females data as the CDF and the PDF generated by moments look reasonably similar thought it fails to catch the peaks of the histogram in case of the PDF. The QQ plot using the Normal Distribution seems to be a great fit for Height of Adult Females data but a poor fit for the Glycohemoglobin data.
+
+Method of Moments - Weibull Distribution
+
+In case of Weibull Distribution, since there are no closed form solutions for the simulataneous equations being used, we use the optimize function instead for an analytical solution.
+
 ```{r}
-#Weibull Distribution 
-meangh <- xbargh
-stdgh <- s2gh
+mean_weibull = function(lambda, k){
+  lambda*gamma(1+1/k)
+}
 
-meanht <- xbarht
-stdht <- s2ht
+var_weib = function(lambda, k){
+  lambda^2*(gamma(1+2/k)-(gamma(1+1/k))^2)
+}
+
+lambda_hat = function(sample_mean, k){
+  sample_mean/gamma(1+1/k)
+}
+
+var_weib_hat = function(sample_mean, k){
+  lambda_hat(sample_mean,k)^2*(gamma(1+2/k)-(gamma(1+1/k))^2)
+}
+
+var_weib_hat_optim = function( k, sample_mean,sample_var){
+  lambda_hat(sample_mean,k)^2*(gamma(1+2/k)-(gamma(1+1/k))^2)-sample_var
+}
+
+mmweib_optimgh = optimize(f=function(x) {abs(var_weib_hat_optim(k=x, 
+                                                       sample_mean=mean(d1$gh),
+                                                       sample_var=var(d1$gh)))},
+                  lower=10, upper=100)
+
+mmweib_optimht = optimize(f=function(x) {abs(var_weib_hat_optim(k=x, 
+                                                       sample_mean=mean(d1$ht),
+                                                       sample_var=var(d1$ht)))},
+                  lower=10, upper=100)
+
+mmweib_khatgh = mmweib_optimgh$minimum
+mmweib_lambdahatgh = lambda_hat(sample_mean=mean(d1$gh), k=mmweib_khatgh)
+mmweib_khatht = mmweib_optimht$minimum
+mmweib_lambdahatht = lambda_hat(sample_mean=mean(d1$ht), k=mmweib_khatht)
+
+Fghweib <- function(x){
+pweibull(x, scale = mmweib_lambdahatgh , shape = mmweib_khatgh)
+}
+
+Fhtweib <- function(x){
+pweibull(x, scale = mmweib_lambdahatht , shape = mmweib_khatht)
+}
+
+plot(ecdf(d1$gh), main = "CDF of Glycohemoglobin - Weibull Distribution")
+curve(Fghweib(x), add = TRUE, col = "blue", lwd = 3)
+
+plot(ecdf(d1$ht), main = "CDF of Height of Adult Females - Weibull Distribution")
+curve(Fhtweib(x), add = TRUE, col = "blue", lwd = 3)
+
+fghweib <- function(x){dweibull(x, scale = mmweib_lambdahatgh , shape = mmweib_khatgh)}
+fhtweib <- function(x){dweibull(x, scale = mmweib_lambdahatht , shape = mmweib_khatht)}
+
+hist(d1$gh, breaks = 100, freq = FALSE, main = "PDF of Glycohemoglobin - Normal Distribution")
+curve(fghweib(x), add = TRUE, col = "blue", lwd = 3)
+
+hist(d1$ht, breaks = 100, freq = FALSE, main = "PDF of Height of Adult Females - Weibull Distribution")
+curve(fhtweib(x), add = TRUE, col = "blue", lwd = 3)
+
+qweibgh <- qweibull(sq, scale = mmweib_lambdahatgh , shape = mmweib_khatgh)
+qweibht <- qweibull(sq, scale = mmweib_lambdahatht , shape = mmweib_khatht)
+plot(qweibgh,qtgh, main="QQ-Plot of Glycohemoglobin - Weibull Distribution ")
+abline(0,1)
+plot(qweibht,qtht, main="QQ-Plot of Height of Adult Females - Weibull Distribution")
+abline(0,1)
 ```
+Method of Moments using the Weibull Distribution seems to be a poor fit for Glycohemoglobin  as significant deviations from the ecdf and the histograms are observed  while it seems to be a somewhat acceptable fit for the Height of Adult Females data as the CDF and the PDF generated by moments look reasonably similar thought it fails to catch the peaks of the histogram in case of the PDF. The QQ plot using the Weibull Distribution seems to be an okay fit for Height of Adult Females data with some deviations but a poor fit for the Glycohemoglobin data.
+
+
+```{r}
+median(d1$gh)
+(mediangammagh <- qgamma(0.5, shape = shape_hatgh, scale = scale_hatgh))
+(mediannormgh <- qnorm(0.5, mean = meangh, sd = stdgh))
+(medianweibgh <- qweibull(0.5, scale = mmweib_lambdahatgh , shape = mmweib_khatgh))
+```
+The above values give the sample median and the estimated median of the Gamma, Normal and Weibull Distribution using the Method of Moments for Glycohemoglobin respectively. They are calculated using the qdist function with p set to 0.5 to get the 50th percentile. 
+
+```{r}
+median(d1$ht)
+(mediangammaht <- qgamma(0.5, shape = shape_hatht, scale = scale_hatht))
+(mediannormht <- qnorm(0.5, mean = meanht, sd = stdht))
+(medianweibht <- qweibull(0.5, scale = mmweib_lambdahatht , shape = mmweib_khatht))
+```
+The aboe values give the sample median and the estimated median of the Gamma, Normal and Weibull Distribution using the Method of Moments for the Height of Adult Females respectively.
+
+#Maximum Likelihood 
+Maximum Likelihood - Gamma Distribution
+
+```{r}
+gh <- d1$gh
+ht <- d1$ht
+
+require(stats4)
+gLLgh <- function(shape, scale){
+  fs <- dgamma(
+        x = gh
+      , scale = scale
+      , shape = shape
+      , log = TRUE
+    ) 
+  -sum(fs)
+}
+
+fitgammagh <- mle(
+    gLLgh
+  , start = list(scale= 0.193, shape = 29.597)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(gh), main = "CDF of Glycohemoglobin - Gamma Distribution")
+curve(
+    pgamma(x, coef(fitgammagh)[1], coef(fitgammagh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(gh, freq = FALSE, main = "PDF of Glycohemoglobin - Gamma Distribution")
+curve(
+    dgamma(x, coef(fitgammagh)[1], coef(fitgammagh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+gLLht <- function(scale, shape){
+  fs <- dgamma(
+        x = ht
+      , scale = scale
+      , shape = shape
+      , log = TRUE
+    ) 
+  -sum(fs)
+}
+
+fitgammaht <- mle(
+    gLLht
+  , start = list(scale = 0.333, shape = 482.188)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(ht), main = "CDF of Height of Adult Females - Gamma Distribution")
+curve(
+    pgamma(x, coef(fitgammaht)[1], coef(fitgammaht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(ht, freq = FALSE, main = "PDF of Height of Adult Females - Gamma Distribution")
+curve(
+    dgamma(x, coef(fitgammaht)[1], coef(fitgammaht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+qgammaghml <- qgamma(sq, shape = coef(fitgammagh)[1], scale = coef(fitgammagh)[2])
+qgammahtml <- qgamma(sq, shape = coef(fitgammaht)[1], scale = coef(fitgammaht)[2])
+plot(qgammaghml,qtgh, main="QQ-Plot of Glycohemoglobin - Gamma Distribution ")
+abline(0,1)
+plot(qgammahtml,qtht, main="QQ-Plot of Height of Adult Females - Gamma Distribution")
+abline(0,1)
+```
+
+Maximum Likelihood - Normal Distribution
+```{r}
+nLLgh <- function(mean, sd){
+  fs <- dnorm(
+        x = gh
+      , mean = mean
+      , sd = sd
+      , log = TRUE
+    ) 
+  -sum(fs)
+}
+
+fitnormgh <- mle(
+    nLLgh
+  , start = list(mean = 1, sd = 1)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(gh), main = "CDF of Glycohemoglobin - Normal Distribution")
+curve(
+    pnorm(x, coef(fitnormgh)[1], coef(fitnormgh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(gh, freq = FALSE, main = "PDF of Glycohemoglobin - Normal Distribution")
+curve(
+    dnorm(x, coef(fitnormgh)[1], coef(fitnormgh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+nLLht <- function(mean, sd){
+  fs <- dnorm(
+        x = ht
+      , mean = mean
+      , sd = sd
+      , log = TRUE
+    ) 
+  -sum(fs)
+}
+
+fitnormht <- mle(
+    nLLht
+  , start = list(mean = 1, sd = 1)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(ht), main = "CDF of Height of Adult Females - Normal Distribution")
+curve(
+    pnorm(x, coef(fitnormht)[1], coef(fitnormht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(ht, freq = FALSE, main = "PDF of Height of Adult Females - Normal Distribution")
+curve(
+    dnorm(x, coef(fitnormht)[1], coef(fitnormht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+qnormghml <- qnorm(sq, mean = coef(fitnormgh)[1], sd = coef(fitnormgh)[2])
+qnormhtml <- qnorm(sq, mean = coef(fitnormht)[1], sd = coef(fitnormht)[2])
+plot(qnormghml,qtgh, main="QQ-Plot of Glycohemoglobin - Normal Distribution ")
+abline(0,1)
+plot(qnormhtml,qtht, main="QQ-Plot of Height of Adult Females - Normal Distribution")
+abline(0,1)
+
+```
+Maximum Likelihood using the Normal Distribution seems to be a poor fit for Glycohemoglobin  as significant deviations from the ecdf and the histograms are observed in Glycohemoglobin data while it seems to be a decent fit for the Height of Adult Females data as the CDF and the PDF generated by moments look reasonably similar thought it fails to catch the peaks of the histogram in case of the PDF. The QQ plot using the Normal Distribution seems to be a great fit for Height of Adult Females data but a poor fit for the Glycohemoglobin data.
+
+Maximum Likelihood - Weibull Distribution 
+
+```{r}
+wLLgh <- function(shape, scale){
+  fs <- dweibull(
+        x = gh
+      , scale = scale
+      , shape = shape
+      , log = TRUE
+    ) 
+  -sum(fs)
+}
+
+fitweibullgh <- mle(
+    wLLgh
+  , start = list(scale= 6.017, shape = 10)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(gh), main = "CDF of Glycohemoglobin - Weibull Distribution")
+curve(
+    pweibull(x, coef(fitweibullgh)[1], coef(fitweibullgh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(gh, freq = FALSE, main = "PDF of Glycohemoglobin - Weibull Distribution")
+curve(
+    dweibull(x, coef(fitweibullgh)[1], coef(fitweibullgh)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+wLLht <- function(scale, shape){
+  fs <- dweibull(
+        x = ht
+      , scale = scale
+      , shape = shape
+      , log = TRUE
+    )
+  -sum(fs)
+}
+
+fitweibullht <- mle(
+    wLLht
+  , start = list(scale = 163.98, shape = 27)
+  , method = "L-BFGS-B"
+  , lower = c(0, 0.01)
+)
+
+plot(ecdf(ht), main = "CDF of Height of Adult Females - Weibull Distribution")
+curve(
+    pweibull(x, coef(fitweibullht)[1], coef(fitweibullht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+hist(ht, freq = FALSE, main = "PDF of Height of Adult Females - Weibull Distribution")
+curve(
+    dweibull(x, coef(fitweibullht)[1], coef(fitweibullht)[2])
+  , add = TRUE
+  , col = "blue"
+  , lwd = 3
+)
+
+qweibullghml <- qweibull(sq, shape = coef(fitweibullgh)[1], scale = coef(fitweibullgh)[2])
+qweibullhtml <- qweibull(sq, shape = coef(fitweibullht)[1], scale = coef(fitweibullht)[2])
+plot(qweibullghml,qtgh, main="QQ-Plot of Glycohemoglobin - Weibull Distribution ")
+abline(0,1)
+plot(qweibullhtml,qtht, main="QQ-Plot of Height of Adult Females - Weibull Distribution")
+abline(0,1)
+```
+
+
+
 
