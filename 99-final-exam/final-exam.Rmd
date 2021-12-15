@@ -538,21 +538,12 @@ Based on the tests performed, we fail reject the null hypothesis due to inconclu
 between 
 The p-value is less than 2.2e^-16, i.e less than 0.05 in both studies.
 ```{r}
-o1 = prop.test(30,100)
-o1
-l1 = prop.test(35,100)
-l1
 
-d1 = prop.test(5,100)
-#d1
+d1 = prop.test(c(30,35), c(100,100))
+d1
 
-o2 = prop.test(600,2000)
-o2
-l2 = prop.test(619,2000)
-l2
-
-d2 = prop.test(19,2000)
-#d2
+d2 = prop.test(c(600,619), c(2000,2000))
+d2
 ```
 
 B. Suppose that prior to the studies, the researchers established an equivalence threshold of 6 percentage points. Using the confidence intervals, which studies (if any) showed a conclusive similarity between surgical approaches for the complication rate. Explain why.
